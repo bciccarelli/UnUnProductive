@@ -1,0 +1,26 @@
+{
+
+  "description": "Redirects you to a productive page",
+  "manifest_version": 2,
+  "name": "UnUnProductive",
+  "version": "1.0",
+  "homepage_url": "https://github.com/AluminumChassis/UnUnProductive",
+  "icons": {
+    "48": "icons/uup.png"
+  },
+  "permissions": [
+    "webRequest",
+    "webRequestBlocking",
+    "webNavigation"
+  ],
+  "background": {
+    "scripts": ["UnUnProductive.js"]
+  },
+  "browser_action": {
+    "default_icon": {
+        "48": "icons/uup.png"
+    },
+    "default_title": "UnUnProductive",
+    "default_popup": "popup/default.html"
+  }
+}
