@@ -11,7 +11,12 @@
   "permissions": [
     "webRequest",
     "webRequestBlocking",
-    "webNavigation"
+    "webNavigation",
+    "storage",
+    "tabs",
+    "http://*/*",
+    "https://*/*",
+    "notifications"
   ],
   "background": {
     "scripts": ["UnUnProductive.js"]
