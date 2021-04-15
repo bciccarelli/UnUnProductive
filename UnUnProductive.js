@@ -1,29 +1,31 @@
 var ignoreNextRequest = {
 
 };
+var unproductiveSites = ["youtube.com"];
+
+var productiveSites = ["https://google.com"];
 
 function redirect(details) {
+    url = details.url
     if (details.method != 'GET') {
         return {};
     }
-    var timestamp = ignoreNextRequest[details.url];
-	if (timestamp) {
-		delete ignoreNextRequest[details.url];
-		return {};
-	}
-    if(details.documentUrl == "https://myspace.com/") {
+    splitUrl = url.split("/")[2]; 
+    parsed = psl.parse(splitUrl);
+    console.log(parsed.domain);
+    if(!unproductiveSites.includes(parsed.domain)) {
         return {};
     }
     console.log("request!!")
-    ignoreNextRequest[details.documentUrl] = new Date().getTime();
     chrome.webRequest.onBeforeRequest.removeListener(redirect)
     setTimeout(listen, 1000)
-    return { redirectUrl: "https://myspace.com/" }
+    return { redirectUrl: productiveSites[0] }
 }
 function listen() {
     browser.webRequest.onBeforeRequest.addListener(
         redirect, {
-            urls: ["https://*/*", "http://*/*"]
+            urls: ["https://*/*", "http://*/*"],
+            types: ["main_frame"]
         },
         ['blocking']
     );

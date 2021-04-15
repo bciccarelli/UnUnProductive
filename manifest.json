@@ -19,7 +19,7 @@
     "notifications"
   ],
   "background": {
-    "scripts": ["UnUnProductive.js"]
+    "scripts": ["UnUnProductive.js", "psl.min.js"]
   },
   "browser_action": {
     "default_icon": {
