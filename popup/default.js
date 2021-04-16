@@ -36,5 +36,5 @@ browser.webRequest.onBeforeRequest.addListener(
   )*/
 browser.runtime.onMessage.addListener(receiveMessage);
 document.getElementById("onoff").onclick = onoff
-document.getElementById("list").onclick = list
+document.getElementById("changeList").onclick = list
 checkUpdate()
