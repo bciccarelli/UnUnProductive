@@ -1,17 +1,20 @@
 var ignoreNextRequest = {
 
 };
-var productiveSites = ["https://forex.com"];
-var unproductiveSites = ["youtube.com", "coolmath.com"];
+var redirectEnabled = true;
+var productiveSites = [""];
+var unproductiveSites = [""];
 
 function redirect(details) {
+    if(!redirectEnabled) {
+        return
+    }
     url = details.url
     if (details.method != 'GET') {
         return {};
     }
     splitUrl = url.split("/")[2]; 
     parsed = psl.parse(splitUrl);
-    console.log(parsed.domain);
     if(!unproductiveSites.includes(parsed.domain)) {
         return {};
     }
@@ -31,6 +34,13 @@ async function setSiteList(pList, upList) {
     if(pList){await browser.storage.local.set({"productive": pList})}
     if(upList){await browser.storage.local.set({"unproductive": upList})}
 }
+async function getEnabled() {
+    enabled = (await browser.storage.local.get("redirectEnabled"))["redirectEnabled"]
+    return enabled
+}
+async function setEnabled(enabled) {
+    await browser.storage.local.set({"redirectEnabled": enabled})
+}
 function listen() {
     browser.webRequest.onBeforeRequest.addListener(
         redirect, {
@@ -43,31 +53,68 @@ function listen() {
 
 async function receiveMessage(request) {
     switch(request.operation) {
-        case "update":
+        case "listsUpdate":
             setSiteList(request.pList, request.upList).then((i)=>{updateLocalLists()})
             break;
         case "getLists":
             getSiteList().then((i)=>{sendListUpdate(i)})
             break;
+        case "enabledUpdate":
+            redirectEnabled = !redirectEnabled
+            setEnabled(redirectEnabled)
+            break;
+        case "getEnabled":
+            getEnabled().then((i)=>{sendEnabledUpdate(i)})
+            break;
     }
 }
 function updateLocalLists() {
     getSiteList().then((a)=>{
-        console.log(a)
         productiveSites = a[0]
         unproductiveSites = a[1]
     })
 }
+function updateLocalEnabled() {
+    getEnabled().then((a)=>{
+        redirectEnabled = a
+    })
+}
 function sendListUpdate(listStorage) {
     browser.runtime.sendMessage({
-        "operation": "update",
+        "operation": "listsUpdate",
         "pList": listStorage[0],
         "upList": listStorage[1]
+    })
+}
+function sendEnabledUpdate(enabled) {
+    browser.runtime.sendMessage({
+        "operation": "enabledUpdate",
+        "enabled": enabled
     })
 }
 function onerror(e) {
     console.log(e)
 }
 
-listen()
-browser.runtime.onMessage.addListener(receiveMessage);
+async function startup() {
+    getEnabled().then((i) => {
+        if(i != false && !i) {
+            redirectEnabled = true
+            setEnabled(true)
+        }
+    })
+    getSiteList().then((i) => {
+        if(Array.isArray(i[0])) {
+            setSiteList([""], null)
+        }
+        if(Array.isArray(i[1])) {
+            setSiteList(null, [""])
+        }
+    })
+    
+    updateLocalLists()
+    updateLocalEnabled()
+    listen()
+    browser.runtime.onMessage.addListener(receiveMessage);
+}
+startup()
