@@ -3,30 +3,48 @@
   <head>
     <meta charset="utf-8">
     <style>
-    *{font-family: Arial, Helvetica, sans-serif; font-size: 16px}
-    section {margin-bottom: 8px;}
+    body {width: 200px; overflow: hidden; padding: 0;}
+    *{font-family: Arial, Helvetica, sans-serif; font-size: 16px; padding: 0}
+    section {margin-bottom: 8px; overflow: hidden;}
+    .siteList {
+      height: 100px;
+      overflow-y: scroll;
+    }
+    input {width:200px; padding: 5px; display: block; box-sizing:border-box; margin-bottom:5px;}
     button {background-color: rgb(39, 39, 39);
-    padding-top: 3%;
-    padding-bottom: 3%;
+    padding-top: 5px;
+    padding-bottom: 5px;
     color: rgb(255, 255, 255);
     border: none;
     cursor: pointer;
-    width: 100%;}
+    width: 200px}
     button:hover {background-color: rgb(131, 197, 255);}
     button:active {background-color: rgb(113, 139, 255);}
     </style>
   </head>
 
-<body>
-  <section>
-    <button id="onoff">Disable</button>
-  </section>
-  <section>
-    <button id="openList">Change Site List</button>
-  </section>
-  <section id="siteList" hidden="true">
-    <input>
-  </section>
-</body>
-<script src="default.js"></script>
+  <body>
+    <section>
+      <button id="onoff">Disable</button>
+    </section>
+    <section>
+      <button id="pOpenList">Productive List</button>
+    </section>
+    <section id="pSiteList" class="siteList" style="display: none;">
+      <input>
+      <input>
+      <input>
+    </section>
+
+    <section>
+      <button id="upOpenList">Unproductive List</button>
+    </section>
+    <section id="upSiteList" class="siteList" style="display: none;">
+      <input>
+      <input>
+      <input>
+    </section>
+    
+  </body>
+  <script src="default.js"></script>
 </html>

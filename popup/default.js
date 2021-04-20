@@ -1,32 +1,30 @@
 let thisInterval
+var productiveSites = [];
+var unproductiveSites = [];
 function onoff(){
     
 }
-
+function pSiteList(){
+    pSiteListElement.style.display = pSiteListElement.style.display == "none" ? "block" : "none"
+}
+function upSiteList(){
+    upSiteListElement.style.display = upSiteListElement.style.display == "none" ? "block" : "none"
+}
 function onError(error) {
-    console.log(`Error: ${error}`);
+    console.log(`Error: ${error}`)
   }  
 
 function receiveMessage(request) {
-    
-    console.log(request.operation)
     if(request.operation == "update") {
-        var query = { active: true, currentWindow: true };
-        function callback(tabs) {
-            if(tabs[0].id == request.tabID) {
-                let endTime = request.endTime;
-                startCountdown(endTime);
-            }
-        }
-        browser.tabs.query(query, callback)
+        productiveSites = request.pList
+        unproductiveSites = request.upList
     }
 }
-function checkUpdate(){
-    var query = { active: true, currentWindow: true };
-    function callback(tabs) {
-        browser.runtime.sendMessage({"operation": "update", "tabID": tabs[0].id})
-    }
-    browser.tabs.query(query, callback)
+function sendUpdate(){
+    browser.runtime.sendMessage({"operation": "update", "pList": ["http://coolmath.com"], "upList": ["youtube.com"]})
+}
+function requestCurrentList(){
+    browser.runtime.sendMessage({"operation": "getLists"})
 }
 /*
 browser.webRequest.onBeforeRequest.addListener(
@@ -34,7 +32,12 @@ browser.webRequest.onBeforeRequest.addListener(
     {},               //  object
     ["blocking"]         //  optional array of strings
   )*/
+
 browser.runtime.onMessage.addListener(receiveMessage);
+pSiteListElement = document.getElementById("pSiteList")
+upSiteListElement = document.getElementById("upSiteList")
 document.getElementById("onoff").onclick = onoff
-document.getElementById("changeList").onclick = list
-checkUpdate()
+document.getElementById("pOpenList").onclick = pSiteList
+document.getElementById("upOpenList").onclick = upSiteList
+sendUpdate()
+requestCurrentList()
