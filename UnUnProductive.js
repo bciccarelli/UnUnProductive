@@ -4,7 +4,6 @@ var ignoreNextRequest = {
 var redirectEnabled = true;
 var productiveSites = [""];
 var unproductiveSites = [""];
-
 function redirect(details) {
     if(!redirectEnabled) {
         return
@@ -26,13 +25,14 @@ function randomArray(a) {
     return a[Math.floor(Math.random() * a.length)];
 }
 async function getSiteList() {
-    productiveSites = (await browser.storage.local.get("productive"))["productive"]
-    unproductiveSites = (await browser.storage.local.get("unproductive"))["unproductive"]
-    return [productiveSites, unproductiveSites]
+    pList = (await browser.storage.local.get("productive"))["productive"]
+    upList = (await browser.storage.local.get("unproductive"))["unproductive"]
+    return [pList, upList]
 }
 async function setSiteList(pList, upList) {
     if(pList){await browser.storage.local.set({"productive": pList})}
     if(upList){await browser.storage.local.set({"unproductive": upList})}
+    return
 }
 async function getEnabled() {
     enabled = (await browser.storage.local.get("redirectEnabled"))["redirectEnabled"]
@@ -54,39 +54,40 @@ function listen() {
 async function receiveMessage(request) {
     switch(request.operation) {
         case "listsUpdate":
-            setSiteList(request.pList, request.upList).then((i)=>{updateLocalLists()})
+            pList = request.pList
+            upList = request.upList
+            console.log(pList)
+            updateLocalLists(pList, upList)
+            await setSiteList(pList, upList)
             break;
         case "getLists":
             getSiteList().then((i)=>{sendListUpdate(i)})
             break;
         case "enabledUpdate":
-            redirectEnabled = !redirectEnabled
-            setEnabled(redirectEnabled)
+            setEnabled(redirectEnabled).then((i)=>{updateLocalEnabled(i)})
             break;
         case "getEnabled":
             getEnabled().then((i)=>{sendEnabledUpdate(i)})
             break;
     }
+    
 }
-function updateLocalLists() {
-    getSiteList().then((a)=>{
-        productiveSites = a[0]
-        unproductiveSites = a[1]
-    })
+async function updateLocalLists(pList, upList) {
+    console.log(pList)
+    if(pList){productiveSites = pList}
+    if(upList){unproductiveSites = upList}
 }
-function updateLocalEnabled() {
-    getEnabled().then((a)=>{
-        redirectEnabled = a
-    })
+async function updateLocalEnabled(enabled) {
+    if(enabled == true || enabled == false){redirectEnabled = enabled}
 }
-function sendListUpdate(listStorage) {
+async function sendListUpdate(listStorage) {
     browser.runtime.sendMessage({
         "operation": "listsUpdate",
         "pList": listStorage[0],
         "upList": listStorage[1]
     })
 }
-function sendEnabledUpdate(enabled) {
+async function sendEnabledUpdate(enabled) {
     browser.runtime.sendMessage({
         "operation": "enabledUpdate",
         "enabled": enabled
@@ -99,21 +100,25 @@ function onerror(e) {
 async function startup() {
     getEnabled().then((i) => {
         if(i != false && !i) {
-            redirectEnabled = true
+            updateLocalEnabled(true)
             setEnabled(true)
+        } else {
+            updateLocalEnabled(i)
         }
     })
     getSiteList().then((i) => {
+        updateLocalLists(i[0], i[1])
         if(Array.isArray(i[0])) {
             setSiteList([""], null)
-        }
+            updateLocalLists([""], null)
+            return
+        } 
         if(Array.isArray(i[1])) {
             setSiteList(null, [""])
+            updateLocalLists(null, [""])
+            return
         }
     })
-    
-    updateLocalLists()
-    updateLocalEnabled()
     listen()
     browser.runtime.onMessage.addListener(receiveMessage);
 }
