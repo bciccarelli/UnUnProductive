@@ -25,7 +25,7 @@ function receiveMessage(request) {
     }
 }
 function sendUpdate(){
-    browser.runtime.sendMessage({"operation": "listsUpdate", "pList": ["http://coolmath.com"], "upList": ["youtube.com"]})
+    browser.runtime.sendMessage({"operation": "listsUpdate", "pList": ["http://forex.com"], "upList": ["youtube.com"]})
 }
 function requestCurrent(){
     browser.runtime.sendMessage({"operation": "getLists"})

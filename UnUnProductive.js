@@ -73,7 +73,7 @@ async function receiveMessage(request) {
     
 }
 async function updateLocalLists(pList, upList) {
-    console.log(pList)
+    console.log([pList, upList])
     if(pList){productiveSites = pList}
     if(upList){unproductiveSites = upList}
 }
@@ -107,13 +107,14 @@ async function startup() {
         }
     })
     getSiteList().then((i) => {
+        console.log(i)
         updateLocalLists(i[0], i[1])
-        if(Array.isArray(i[0])) {
+        if(!Array.isArray(i[0])) {
             setSiteList([""], null)
             updateLocalLists([""], null)
             return
         } 
-        if(Array.isArray(i[1])) {
+        if(!Array.isArray(i[1])) {
             setSiteList(null, [""])
             updateLocalLists(null, [""])
             return
