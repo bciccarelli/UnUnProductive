@@ -56,7 +56,6 @@ async function receiveMessage(request) {
         case "listsUpdate":
             pList = request.pList
             upList = request.upList
-            console.log(pList)
             updateLocalLists(pList, upList)
             await setSiteList(pList, upList)
             break;
@@ -73,7 +72,6 @@ async function receiveMessage(request) {
     
 }
 async function updateLocalLists(pList, upList) {
-    console.log([pList, upList])
     if(pList){productiveSites = pList}
     if(upList){unproductiveSites = upList}
 }
@@ -107,7 +105,6 @@ async function startup() {
         }
     })
     getSiteList().then((i) => {
-        console.log(i)
         updateLocalLists(i[0], i[1])
         if(!Array.isArray(i[0])) {
             setSiteList([""], null)

@@ -5,20 +5,44 @@ var redirectEnabled = true;
 function onoff(){
     browser.runtime.sendMessage({"operation": "enabledUpdate", "enabled": true})
 }
-function pSiteList(){
+function pOpenList(){
     pSiteListElement.style.display = pSiteListElement.style.display == "none" ? "block" : "none"
 }
-function upSiteList(){
+function upOpenList(){
     upSiteListElement.style.display = upSiteListElement.style.display == "none" ? "block" : "none"
 }
 function onError(error) {
     console.log(`Error: ${error}`)
-  }  
+}
+function shouter() {
+    console.log("SHOUTING")
+}
+function updateListElements(){
+    pSiteListElement.innerHTML = ""
+    for(var i in productiveSites) {
+        createInputBox(pSiteListElement, productiveSites[i], shouter)
+    }
+    createInputBox(pSiteListElement, "", shouter)
 
+    upSiteListElement.innerHTML = ""
+    for(var i in productiveSites) {
+        createInputBox(upSiteListElement, unproductiveSites[i], shouter)
+    }
+    createInputBox(upSiteListElement, "", shouter)
+
+}
+function createInputBox(parent, value, changeEvent) {
+    inputElement = document.createElement("input")
+    inputElement.value = value
+    inputElement.addEventListener("input", changeEvent)
+    parent.appendChild(inputElement)
+}
 function receiveMessage(request) {
     if(request.operation == "listsUpdate") {
         productiveSites = request.pList
         unproductiveSites = request.upList
+        updateListElements()
+        console.log([productiveSites, unproductiveSites])
     }
     if(request.operation == "enabledUpdate") {
         redirectEnabled = request.enabled
@@ -43,8 +67,8 @@ function startup() {
     pSiteListElement = document.getElementById("pSiteList")
     upSiteListElement = document.getElementById("upSiteList")
     document.getElementById("onoff").onclick = onoff
-    document.getElementById("pOpenList").onclick = pSiteList
-    document.getElementById("upOpenList").onclick = upSiteList
+    document.getElementById("pOpenList").onclick = pOpenList
+    document.getElementById("upOpenList").onclick = upOpenList
     requestCurrent()
     sendUpdate()
 }
