@@ -2,8 +2,10 @@ let thisInterval
 var productiveSites = [];
 var unproductiveSites = [];
 var redirectEnabled = true;
-function onoff(){
-    browser.runtime.sendMessage({"operation": "enabledUpdate", "enabled": true})
+function enableFunction(){
+    redirectEnabled = !redirectEnabled
+    browser.runtime.sendMessage({"operation": "enabledUpdate", "enabled": redirectEnabled})
+    updateEnabledElement()
 }
 function pOpenList(){
     pSiteListElement.style.display = pSiteListElement.style.display == "none" ? "block" : "none"
@@ -30,6 +32,9 @@ function updateListElements(){
     }
     createInputBox(upSiteListElement, "", shouter)
 
+}
+function updateEnabledElement() {
+    enabledElement.innerHTML = redirectEnabled ? "Disable" : "Enable"
 }
 function createInputBox(parent, value, changeEvent) {
     inputElement = document.createElement("input")
@@ -73,6 +78,7 @@ function receiveMessage(request) {
     }
     if(request.operation == "enabledUpdate") {
         redirectEnabled = request.enabled
+        updateEnabledElement()
     }
 }
 function sendListUpdate(pList, upList){
@@ -93,7 +99,8 @@ function startup() {
     browser.runtime.onMessage.addListener(receiveMessage);
     pSiteListElement = document.getElementById("pSiteList")
     upSiteListElement = document.getElementById("upSiteList")
-    document.getElementById("onoff").onclick = onoff
+    enabledElement = document.getElementById("enableElement")
+    enabledElement.onclick = enableFunction
     document.getElementById("pOpenList").onclick = pOpenList
     document.getElementById("upOpenList").onclick = upOpenList
     requestCurrent()

@@ -6,7 +6,7 @@ var productiveSites = [""];
 var unproductiveSites = [""];
 function redirect(details) {
     if(!redirectEnabled) {
-        return
+        return {};
     }
     url = details.url
     if (details.method != 'GET') {
@@ -63,7 +63,9 @@ async function receiveMessage(request) {
             getSiteList().then((i)=>{sendListUpdate(i)})
             break;
         case "enabledUpdate":
-            setEnabled(redirectEnabled).then((i)=>{updateLocalEnabled(i)})
+            enabled = request.enabled
+            updateLocalEnabled(enabled)
+            await setEnabled(enabled)
             break;
         case "getEnabled":
             getEnabled().then((i)=>{sendEnabledUpdate(i)})
