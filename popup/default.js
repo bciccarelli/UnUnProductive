@@ -14,8 +14,8 @@ function upOpenList(){
 function onError(error) {
     console.log(`Error: ${error}`)
 }
-function shouter() {
-    console.log("SHOUTING")
+function shouter(e) {
+    readInputBoxes(e.target.parentElement)
 }
 function updateListElements(){
     pSiteListElement.innerHTML = ""
@@ -37,6 +37,34 @@ function createInputBox(parent, value, changeEvent) {
     inputElement.addEventListener("input", changeEvent)
     parent.appendChild(inputElement)
 }
+function readInputBoxes(listElement) {
+    tempList = []
+    childrenList = listElement.children
+    emptyFound = false
+    for(i of childrenList) {
+        if(i.value == "") {
+            if(!emptyFound) {
+                emptyFound = i
+            } else {
+                if(document.activeElement == i) {
+                    emptyFound.focus()
+                }
+                listElement.removeChild(i) 
+                continue;
+            }
+        } else {
+            tempList.push(i.value)
+        }
+    }
+    if(!emptyFound) {
+        createInputBox(listElement, "", shouter)
+    }
+    if(listElement.id == "pSiteList") {
+        sendListUpdate(tempList, null)
+    } else {
+        sendListUpdate(null, tempList)
+    }
+}
 function receiveMessage(request) {
     if(request.operation == "listsUpdate") {
         productiveSites = request.pList
@@ -48,8 +76,8 @@ function receiveMessage(request) {
         redirectEnabled = request.enabled
     }
 }
-function sendUpdate(){
-    browser.runtime.sendMessage({"operation": "listsUpdate", "pList": ["http://forex.com"], "upList": ["youtube.com"]})
+function sendListUpdate(pList, upList){
+    browser.runtime.sendMessage({"operation": "listsUpdate", "pList": pList, "upList": upList})
 }
 function requestCurrent(){
     browser.runtime.sendMessage({"operation": "getLists"})
@@ -70,6 +98,6 @@ function startup() {
     document.getElementById("pOpenList").onclick = pOpenList
     document.getElementById("upOpenList").onclick = upOpenList
     requestCurrent()
-    sendUpdate()
+    sendListUpdate()
 }
 startup()
