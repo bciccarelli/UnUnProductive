@@ -20,13 +20,13 @@ function shouter(e) {
     readInputBoxes(e.target.parentElement)
 }
 function updateListElements(){
-    pSiteListElement.innerHTML = ""
+    pSiteListElement.textContent = ""
     for(var i in productiveSites) {
         createInputBox(pSiteListElement, productiveSites[i], shouter)
     }
     createInputBox(pSiteListElement, "", shouter)
 
-    upSiteListElement.innerHTML = ""
+    upSiteListElement.textContent = ""
     for(var i in productiveSites) {
         createInputBox(upSiteListElement, unproductiveSites[i], shouter)
     }
@@ -34,7 +34,7 @@ function updateListElements(){
 
 }
 function updateEnabledElement() {
-    enabledElement.innerHTML = redirectEnabled ? "Disable" : "Enable"
+    enabledElement.textContent = redirectEnabled ? "Disable" : "Enable"
 }
 function createInputBox(parent, value, changeEvent) {
     inputElement = document.createElement("input")
