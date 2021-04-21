@@ -70,7 +70,6 @@ function receiveMessage(request) {
         productiveSites = request.pList
         unproductiveSites = request.upList
         updateListElements()
-        console.log([productiveSites, unproductiveSites])
     }
     if(request.operation == "enabledUpdate") {
         redirectEnabled = request.enabled
